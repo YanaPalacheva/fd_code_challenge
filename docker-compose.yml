@@ -1,0 +1,28 @@
+version: '3'
+services:
+  crawler:
+    build: ./crawler
+    container_name: crawler
+    tty: true
+    volumes:
+      - ./data:/app/data
+    environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: password
+        POSTGRES_HOST: db
+        POSTGRES_PORT: 5432
+        POSTGRES_DB: events_db
+    depends_on:
+      - db
+  db:
+    image: postgres:latest
+    restart: always
+    container_name: postgres_db
+    volumes:
+        - ./db_data:/var/lib/postgresql/data
+    ports:
+        - "5432:5432"
+    environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: events_db
