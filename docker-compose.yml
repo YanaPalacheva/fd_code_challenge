@@ -4,6 +4,7 @@ services:
     build: ./crawler
     container_name: crawler
     tty: true
+    restart: on-failure
     volumes:
       - ./data:/app/data
     environment:
@@ -13,13 +14,19 @@ services:
         POSTGRES_PORT: 5432
         POSTGRES_DB: events_db
     depends_on:
-      - db
+        db:
+          condition: service_healthy
   db:
     image: postgres:latest
     restart: always
     container_name: postgres_db
     volumes:
         - ./db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 7
     ports:
         - "5432:5432"
     environment:
